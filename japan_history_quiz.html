@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>日本歴史 人物テスト</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5EFE6;--sur:#FFFFFF;--sur2:#EDE5D8;
+  --ink:#3D2B1F;--ink2:#7A6355;--ink3:#B09A8A;
+  --brd:#DDD0C4;--brd2:#C8B8AB;
+  --acc:#C4845A;--acc-l:#FAF0E8;--acc-m:#D4957A;--acc-d:#9A5C38;
+  --amb:#854F0B;--amb-l:#FAEEDA;--amb-b:#FAC775;--amb-m:#BA7517;
+  --pur:#534AB7;--pur-l:#EEEDFE;--pur-b:#AFA9EC;
+  --red:#A32D2D;--red-l:#FCEBEB;
+  --grn:#0F6E56;--grn-l:#E1F5EE;--grn-m:#1D9E75;--grn-d:#085041;
+  --r:16px;--rs:12px
+}
+body{font-family:'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic UI',sans-serif;color:var(--ink);background:var(--bg);min-height:100vh}
+.app{max-width:600px;margin:0 auto;padding:0 20px 60px}
+
+/* ---- HOME header (centered, large) ---- */
+.home-hdr{text-align:center;padding:52px 0 32px}
+.home-hdr-icon{font-size:72px;margin-bottom:16px;display:block;line-height:1}
+.home-hdr-title{font-size:34px;font-weight:900;letter-spacing:.06em;color:var(--ink);margin-bottom:10px}
+.home-hdr-sub{font-size:14px;color:var(--ink2);line-height:1.8}
+
+/* ---- compact header for other tabs ---- */
+.hdr{display:flex;align-items:center;gap:12px;padding:20px 0 0;margin-bottom:20px}
+.hdr-logo{width:38px;height:38px;background:var(--acc);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-logo svg{width:20px;height:20px}
+.hdr-title{font-size:18px;font-weight:700;letter-spacing:.03em;color:var(--ink)}
+.hdr-sub{font-size:11px;color:var(--ink3);margin-top:2px}
+
+/* Tabs */
+.tabs{display:flex;gap:3px;margin-bottom:20px;background:var(--sur2);border-radius:var(--r);padding:4px}
+.tab{flex:1;padding:10px 6px;border-radius:var(--rs);border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;color:var(--ink2);background:none;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--acc)}
+.tab.active{background:var(--sur);color:var(--acc);border:0.5px solid var(--brd)}
+
+/* Screens */
+.screen{display:none}.screen.on{display:block}
+
+/* ===== HOME ===== */
+.home-section-label{font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;text-align:center}
+.test-grid{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.test-btn{background:var(--sur);border:1.5px solid var(--brd);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .18s;width:100%;display:flex;align-items:center;gap:14px;text-align:left}
+.test-btn:hover{border-color:var(--acc-m);background:var(--acc-l)}
+.test-btn.sel{border:2.5px solid var(--acc);background:var(--acc-l)}
+.tb-body{flex:1;min-width:0}
+.tb-era{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.tb-num{font-size:12px;color:var(--ink3)}
+.test-btn.sel .tb-era{color:var(--acc-d)}
+.tb-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.tb-pill{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700}
+.pill-done{background:var(--acc-l);color:var(--acc-d)}
+.pill-none{background:var(--sur2);color:var(--ink3)}
+.tb-bar{height:4px;width:60px;background:var(--sur2);border-radius:2px;overflow:hidden}
+.tb-bar-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .6s}
+.start-btn{width:100%;padding:18px;background:var(--acc);color:#fff;border:none;border-radius:24px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;letter-spacing:.06em;margin-bottom:24px}
+.start-btn:hover:not(:disabled){background:var(--acc-m)}
+.start-btn:disabled{background:var(--brd);color:var(--ink3);cursor:default}
+/* home summary cards */
+.home-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.home-card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r);padding:18px 16px;cursor:pointer;transition:all .15s;text-align:center}
+.home-card:hover{border-color:var(--acc-m);background:var(--acc-l)}
+.home-card-icon{font-size:28px;margin-bottom:8px;display:block}
+.home-card-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.home-card-sub{font-size:12px;color:var(--ink3);line-height:1.5}
+
+/* ===== DRILL ===== */
+.drill-banner{background:var(--amb-l);border:1px solid var(--amb-b);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.drill-banner-title{font-size:15px;font-weight:700;color:#412402;margin-bottom:4px}
+.drill-banner-sub{font-size:13px;color:var(--amb);line-height:1.6}
+.drill-cnt-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.drill-cnt-lbl{font-size:13px;color:var(--ink2);white-space:nowrap;font-weight:600}
+.drill-cnt-sel{padding:8px 12px;border-radius:var(--rs);border:1px solid var(--brd);background:var(--sur);font-size:13px;font-family:inherit;color:var(--ink);flex:1;cursor:pointer}
+.weak-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.weak-item{background:var(--sur);border:1px solid var(--brd);border-radius:var(--rs);padding:12px 14px;display:flex;align-items:center;gap:12px}
+.w-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.r1{background:#FCEBEB;color:#791F1F}.r2{background:#FAEEDA;color:#633806}.r3{background:#EEEDFE;color:#3C3489}.rn{background:var(--sur2);color:var(--ink3)}
+.w-info{flex:1;min-width:0}
+.w-name{font-size:14px;font-weight:700}
+.w-meta{font-size:11px;color:var(--ink3);margin-top:2px}
+.w-miss{font-size:13px;font-weight:700;color:var(--red);flex-shrink:0}
+.no-data{text-align:center;padding:40px 20px;color:var(--ink3)}
+.no-data-icon{font-size:32px;margin-bottom:10px}
+.no-data-title{font-size:15px;font-weight:700;color:var(--ink2);margin-bottom:4px}
+.no-data-sub{font-size:12px}
+.drill-start-btn{width:100%;padding:15px;background:var(--amb);color:#fff;border:none;border-radius:var(--rs);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.drill-start-btn:hover:not(:disabled){background:var(--amb-m)}
+.drill-start-btn:disabled{background:var(--brd);color:var(--ink3);cursor:default}
+
+/* ===== HISTORY ===== */
+.hist-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.hstat{background:var(--sur2);border-radius:var(--rs);padding:14px;text-align:center}
+.hstat-n{font-size:26px;font-weight:800;line-height:1}
+.hstat-l{font-size:11px;color:var(--ink3);margin-top:4px}
+.section-card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.section-title{font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.test-breakdown{display:flex;flex-direction:column;gap:8px}
+.tbr{display:flex;align-items:center;gap:10px}
+.tbr-label{font-size:12px;font-weight:700;color:var(--ink2);width:54px;flex-shrink:0}
+.tbr-bar-outer{flex:1;height:14px;background:var(--sur2);border-radius:7px;overflow:hidden}
+.tbr-bar-inner{height:100%;background:var(--acc);border-radius:7px;transition:width .6s ease}
+.tbr-pct{font-size:12px;font-weight:700;color:var(--acc);width:38px;text-align:right;flex-shrink:0}
+.tbr-cnt{font-size:11px;color:var(--ink3);width:36px;flex-shrink:0}
+.hist-log{display:flex;flex-direction:column;gap:8px}
+.log-item{background:var(--sur);border:1px solid var(--brd);border-radius:var(--rs);padding:12px 14px;display:flex;align-items:center;gap:12px}
+.log-mode{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;line-height:1.2;text-align:center}
+.lm-test{background:var(--acc-l);color:var(--acc-d)}
+.lm-drill{background:var(--amb-l);color:var(--amb)}
+.log-info{flex:1;min-width:0}
+.log-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-meta{font-size:11px;color:var(--ink3);margin-top:2px}
+.log-score{text-align:right;flex-shrink:0}
+.log-pct{font-size:15px;font-weight:800}
+.log-cnt{font-size:11px;color:var(--ink3);margin-top:1px}
+
+/* ===== QUIZ ===== */
+.prog-bar{height:5px;background:var(--sur2);border-radius:3px;margin-bottom:16px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .3s}
+.pf-n{background:var(--acc)}.pf-d{background:#EF9F27}
+.q-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.q-ctr{font-size:13px;color:var(--ink2);font-weight:600}
+.q-mbadge{font-size:11px;padding:4px 12px;border-radius:20px;font-weight:700}
+.mb-n{background:var(--acc-l);color:var(--acc-d)}.mb-d{background:var(--amb-l);color:var(--amb)}
+.dots{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--brd);border:none;cursor:pointer;padding:0;transition:all .18s}
+.dot.ok{background:var(--acc)}.dot.ng{background:var(--red)}.dot.sk{background:var(--brd2)}.dot.cur{background:var(--ink);transform:scale(1.4)}
+.card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.q-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tag{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--brd)}
+.t-yr{background:var(--sur2);color:var(--ink2)}
+.t-ev{background:var(--amb-l);color:var(--amb);border-color:var(--amb-b);font-weight:700}
+.t-era{background:var(--pur-l);color:var(--pur);border-color:var(--pur-b)}
+.miss-badge{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--red-l);border-radius:var(--rs);margin-bottom:10px;font-size:13px;color:var(--red);font-weight:700;border:1px solid #F09595}
+.q-text{font-size:18px;font-weight:700;line-height:1.6;margin-bottom:8px}
+.q-desc{font-size:13px;color:var(--ink2);line-height:1.7;padding:10px 14px;background:var(--sur2);border-radius:var(--rs);border-left:3px solid var(--brd2)}
+.ans-lbl{font-size:11px;color:var(--ink3);margin:14px 0 6px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.ans-inp{width:100%;min-height:56px;padding:14px 16px;border:2px solid var(--brd);border-radius:var(--rs);font-size:22px;font-family:inherit;background:var(--sur);color:var(--ink);outline:none;transition:border-color .15s;-webkit-user-select:text;user-select:text}
+.ans-inp:focus{border-color:var(--acc)}
+.ans-inp.ok{border-color:var(--grn-m);background:#F0FAF6}
+.ans-inp.ng{border-color:var(--red);background:var(--red-l)}
+.res-row{display:none;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--rs);margin:10px 0;font-size:14px;font-weight:700}
+.res-row.on{display:flex}
+.res-row.ok{background:var(--grn-l);color:var(--grn-d)}.res-row.ng{background:var(--red-l);color:var(--red)}
+.ri{font-size:18px}
+.ca{font-size:16px;font-weight:800}
+.ca.ok{color:var(--grn)}.ca.ng{color:var(--red)}
+.btn-row{display:flex;gap:10px;margin-top:8px}
+.btn{flex:1;padding:14px;border-radius:var(--rs);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .15s;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn-chk{background:var(--acc);color:#fff}
+.btn-chk:hover{background:var(--acc-m)}
+.btn-chk.drill{background:var(--amb)}
+.btn-chk.drill:hover{background:var(--amb-m)}
+.btn-nxt{background:var(--sur2);color:var(--ink);border:1px solid var(--brd);display:none}
+.btn-nxt:hover{background:var(--brd)}
+.btn-skp{background:none;color:var(--ink3);border:1px solid var(--brd);flex:0 0 auto;padding:14px 18px}
+.btn-skp:hover{background:var(--sur2)}
+
+/* ===== SUMMARY ===== */
+.sum-wrap{text-align:center;padding:32px 8px}
+.sum-score{font-size:64px;font-weight:900;line-height:1}
+.sum-score.n{color:var(--acc)}.sum-score.d{color:var(--amb)}
+.sum-lbl{font-size:14px;color:var(--ink2);margin:8px 0 20px;line-height:1.5}
+.sum-pbar{height:10px;background:var(--sur2);border-radius:5px;margin-bottom:20px;overflow:hidden}
+.sum-pfill{height:100%;border-radius:5px;transition:width 1s ease}
+.spf-n{background:var(--acc)}.spf-d{background:#EF9F27}
+.sum-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.ss{background:var(--sur2);border-radius:var(--rs);padding:14px;text-align:center}
+.ss-n{font-size:28px;font-weight:800}
+.ss-l{font-size:12px;color:var(--ink3);margin-top:4px}
+.sum-weak{background:var(--amb-l);border:1px solid var(--amb-b);border-radius:var(--r);padding:14px;margin-bottom:16px;text-align:left}
+.sum-weak-t{font-size:13px;font-weight:700;color:#412402;margin-bottom:10px}
+.sum-weak-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:3px 0}
+.sum-weak-name{color:var(--ink)}
+.sum-weak-cnt{color:var(--red);font-weight:700}
+.btn-row-s{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.btn-s{padding:14px 30px;border-radius:24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all .15s}
+.btn-s:active{transform:scale(.97)}
+.btn-s.n{background:var(--acc);color:#fff}.btn-s.n:hover{background:var(--acc-m)}
+.btn-s.d{background:var(--amb);color:#fff}.btn-s.d:hover{background:var(--amb-m)}
+.btn-back{background:none;border:none;color:var(--ink3);font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;display:block;width:100%;padding:4px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME (full centered layout, no compact header) -->
+  <div id="sHome" class="screen on">
+    <div class="home-hdr">
+      <span class="home-hdr-icon">📖</span>
+      <div class="home-hdr-title">日本歴史 人物テスト</div>
+      <div class="home-hdr-sub">Scribbleで人物名を書いて答えよう<br>1セット12〜13問</div>
+    </div>
+    <div class="home-section-label">テスト を選ぼう</div>
+    <div class="test-grid" id="testGrid"></div>
+    <button class="start-btn" id="startBtn" onclick="startSelected()" disabled>テストを選択してください</button>
+    <div class="home-cards">
+      <div class="home-card" onclick="gotoTab('history')">
+        <span class="home-card-icon">📊</span>
+        <div class="home-card-title">学習きろく</div>
+        <div class="home-card-sub" id="homeHistSub">まだありません</div>
+      </div>
+      <div class="home-card" onclick="gotoTab('drill')">
+        <span class="home-card-icon">🔥</span>
+        <div class="home-card-title">苦手ドリル</div>
+        <div class="home-card-sub" id="homeDrillSub">苦手問題がまだありません</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRILL & HISTORY: compact header + tabs -->
+  <div id="sOther" class="screen">
+    <div class="hdr">
+      <div class="hdr-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="hdr-title">日本歴史 人物テスト</div>
+        <div class="hdr-sub">1問1答 + 苦手克服ドリル + 学習の記録</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab" onclick="gotoTab('home')">テスト選択</button>
+      <button class="tab" id="tabDrill" onclick="gotoTab('drill')">苦手ドリル</button>
+      <button class="tab" id="tabHistory" onclick="gotoTab('history')">学習の記録</button>
+    </div>
+
+    <!-- DRILL -->
+    <div id="sDrill" class="screen">
+      <div class="drill-banner">
+        <div class="drill-banner-title">苦手克服ドリル</div>
+        <div class="drill-banner-sub">間違えた・スキップした問題を集中練習。<br>間違いが多い順に出題し、弱点を徹底克服します。</div>
+      </div>
+      <div class="drill-cnt-row">
+        <span class="drill-cnt-lbl">出題数：</span>
+        <select class="drill-cnt-sel" id="drillCnt">
+          <option value="5">5問</option>
+          <option value="10" selected>10問</option>
+          <option value="20">20問</option>
+          <option value="999">全問</option>
+        </select>
+      </div>
+      <div id="weakListEl"></div>
+      <button class="drill-start-btn" id="drillBtn" onclick="startDrill()" disabled>ドリルを開始</button>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="sHistory" class="screen">
+      <div class="hist-stats" id="histStats"></div>
+      <div class="section-card">
+        <div class="section-title">正解率の推移（直近10回）</div>
+        <div style="position:relative;width:100%;height:180px">
+          <canvas id="histChart" role="img" aria-label="学習履歴の正解率推移グラフ">学習記録がありません</canvas>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-title">テスト別 最高正解率</div>
+        <div class="test-breakdown" id="testBreakdown"></div>
+      </div>
+      <div class="section-card">
+        <div class="section-title">受験履歴</div>
+        <div id="histLog"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="sQuiz" class="screen">
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    <div class="q-hdr">
+      <div class="q-ctr" id="qCtr"></div>
+      <div class="q-mbadge" id="mBadge"></div>
+    </div>
+    <div class="dots" id="dotsEl"></div>
+    <div class="card">
+      <div class="q-tags" id="qTags"></div>
+      <div class="miss-badge" id="missBadge" style="display:none">
+        <span style="font-size:16px;font-weight:900">!</span><span id="missText"></span>
+      </div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-desc" id="qDesc"></div>
+      <div class="ans-lbl">氏名を書いてください</div>
+      <input class="ans-inp" id="ansInp" type="text" inputmode="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="ここに書く...">
+      <div class="res-row" id="resRow">
+        <span class="ri" id="rIcon"></span><span id="rMsg"></span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-chk" id="btnChk" onclick="checkAns()">答え合わせ</button>
+        <button class="btn btn-nxt" id="btnNxt" onclick="nextQ()">次の問題 →</button>
+        <button class="btn btn-skp" onclick="skipQ()">スキップ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="sSummary" class="screen">
+    <div class="sum-wrap">
+      <div class="sum-score" id="sumScore"></div>
+      <div class="sum-lbl" id="sumLbl"></div>
+      <div class="sum-pbar"><div class="sum-pfill" id="sumPfill"></div></div>
+      <div class="sum-stats">
+        <div class="ss"><div class="ss-n" style="color:var(--grn)" id="sC"></div><div class="ss-l">正解</div></div>
+        <div class="ss"><div class="ss-n" style="color:var(--red)" id="sW"></div><div class="ss-l">不正解・スキップ</div></div>
+      </div>
+      <div class="sum-weak" id="sumWeak" style="display:none">
+        <div class="sum-weak-t">間違えた問題（苦手リストに追加）</div>
+        <div id="sumWeakList"></div>
+      </div>
+      <div class="btn-row-s" id="sumBtnRow"></div>
+      <button class="btn-back" onclick="goHome()">テスト選択に戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TESTS = [
+  {id:1,label:"テスト1",era:"弥生〜平安",questions:[
+    {num:"①",years:"？〜？年",event:"239年 魏に使いを送った",answer:"卑弥呼",hint:"3世紀ごろ、倭（当時の日本）の邪馬台国を治めていた女王",era:"弥生時代"},
+    {num:"②",years:"574〜622年",event:"593年 摂政になった",answer:"聖徳太子",hint:"天皇中心の政治と仏教で平和な国づくりにつとめた",era:"古墳時代"},
+    {num:"③",years:"？〜？年",event:"607年 遣隋使として隋へ渡った",answer:"小野妹子",hint:"聖徳太子の使者として中国（隋）に渡る",era:"飛鳥時代"},
+    {num:"④",years:"614〜669年",event:"645年 大化の改新",answer:"中臣鎌足",hint:"天皇中心の政治を実現しようと蘇我氏を倒し大化の改新を進めた",era:"飛鳥時代"},
+    {num:"⑤",years:"626〜671年",event:"645年 大化の改新",answer:"中大兄皇子",hint:"中臣鎌足と共に蘇我氏を倒し、後に天智天皇となった",era:"飛鳥時代"},
+    {num:"⑥",years:"？〜645年",event:"645年 大化の改新で倒れた",answer:"蘇我入鹿",hint:"天皇をしのぐほど強くなった後、中大兄皇子らに暗殺された",era:"飛鳥時代"},
+    {num:"⑦",years:"701〜756年",event:"752年 東大寺の大仏が完成",answer:"聖武天皇",hint:"仏教で世の中の混乱をしずめ国を守ろうとした",era:"奈良時代"},
+    {num:"⑧",years:"668〜749年",event:"752年 大仏作りの中心となった",answer:"行基",hint:"ため池や道路、橋など土木工事を進め貧しい農民を助けた",era:"奈良時代"},
+    {num:"⑨",years:"688〜763年",event:"753年 中国（唐）から来日",answer:"鑑真",hint:"正しい仏教を広めるために日本へ招かれ仏教を発展させた",era:"奈良時代"},
+    {num:"⑩",years:"966〜1027年",event:"1016年 摂政になった",answer:"藤原道長",hint:"娘を天皇と結婚させ政治の実権をにぎる摂関政治をした",era:"平安時代"},
+    {num:"⑪",years:"？〜？年",event:"11世紀 源氏物語を書いた",answer:"紫式部",hint:"かな文字で貴族の恋愛や生き方を美しくえがいた",era:"平安時代"},
+    {num:"⑫",years:"？〜？年",event:"11世紀 枕草子を書いた",answer:"清少納言",hint:"かな文字で貴族の暮らしや人々の感情を細やかにえがいた",era:"平安時代"},
+  ]},
+  {id:2,label:"テスト2",era:"鎌倉〜室町",questions:[
+    {num:"①",years:"1118〜1181年",event:"1156年 保元の乱",answer:"平 清盛",hint:"武士で初めて太政大臣となり、政治に大きな影響力を持った",era:"平安〜鎌倉"},
+    {num:"②",years:"1147〜1199年",event:"1192年 鎌倉に幕府を開いた",answer:"源 頼朝",hint:"平氏との戦いに勝ち、征夷大将軍となり政治をつかさどった",era:"鎌倉時代"},
+    {num:"③",years:"1159〜1189年",event:"1185年 壇ノ浦で平氏を滅ぼした",answer:"源 義経",hint:"兄の源頼朝の指揮のもと、平氏を滅ぼした",era:"鎌倉時代"},
+    {num:"④",years:"1157〜1225年",event:"1221年 承久の乱",answer:"北条政子",hint:"源頼朝の妻。頼朝の死後、幕府の実権をにぎった",era:"鎌倉時代"},
+    {num:"⑤",years:"1251〜1284年",event:"1274年 文永の役 / 1281年 弘安の役",answer:"北条時宗",hint:"２度にわたる元軍の襲来（元寇）を退けた",era:"鎌倉時代"},
+    {num:"⑥",years:"1215〜1294年",event:"1274年 文永の役 / 1281年 弘安の役",answer:"フビライ・ハン",hint:"モンゴル帝国（元）の王。勢力を広げ日本も侵略しようとした",era:"鎌倉時代"},
+    {num:"⑦",years:"1358〜1408年",event:"1397年 金閣寺が完成",answer:"足利義満",hint:"室町幕府の三代目将軍。中国（明）との貿易で利益を得た",era:"室町時代"},
+    {num:"⑧",years:"1436〜1490年",event:"1467年 応仁の乱、隠居",answer:"足利義政",hint:"足利義満の孫。京都の東山に書院造の銀閣寺を建てた",era:"室町時代"},
+    {num:"⑨",years:"1420〜1506年",event:"1486年 山水長巻を完成",answer:"雪舟",hint:"中国で水墨画を学び、日本風の様式に完成させた",era:"室町時代"},
+    {num:"⑩",years:"？〜1521年",event:"1520年 マゼラン海峡を越えた",answer:"マゼラン",hint:"大航海時代のポルトガルの航海者。太平洋を横断した",era:"室町時代"},
+    {num:"⑪",years:"1506〜1552年",event:"1549年 鹿児島に上陸・キリスト教伝来",answer:"ザビエル",hint:"スペインの宣教師。鹿児島、長崎、山口、京都などで布教活動をした",era:"室町時代"},
+    {num:"⑫",years:"1521〜1573年",event:"1575年 長篠の戦いで信長に敗れる",answer:"武田信玄",hint:"戦国時代の大名。織田信長や徳川家康と対立していた",era:"戦国時代"},
+  ]},
+  {id:3,label:"テスト3",era:"安土桃山〜江戸",questions:[
+    {num:"①",years:"1534〜1582年",event:"1573年 室町幕府を滅ぼした",answer:"織田信長",hint:"桶狭間の戦いで今川義元を破り全国統一を目指した",era:"安土桃山"},
+    {num:"②",years:"1537〜1598年",event:"1582年 太閤検地をはじめた",answer:"豊臣秀吉",hint:"信長の後をつぎ全国を統一、年貢を集めるしくみ作りや兵農分離を進めた",era:"安土桃山"},
+    {num:"③",years:"1542〜1616年",event:"1603年 江戸幕府を開いた",answer:"徳川家康",hint:"関ヶ原の戦いで豊臣方を破り、以降260年以上続く徳川幕府の基礎を作った",era:"江戸時代"},
+    {num:"④",years:"1604〜1651年",event:"1639年 鎖国体制が完成した",answer:"徳川家光",hint:"武家諸法度に参勤交代を追加するなど、大名を支配するしくみを完成した",era:"江戸時代"},
+    {num:"⑤",years:"？〜1638年",event:"1637年 島原の乱",answer:"天草四郎",hint:"島原や天草で3万人あまりの農民が起こした一揆の中心人物",era:"江戸時代"},
+    {num:"⑥",years:"？〜1669年",event:"1669年 シャクシャインの戦い",answer:"シャクシャイン",hint:"不利な取引や差別に抗議し松前藩と戦いを起こしたアイヌの首長",era:"江戸時代"},
+    {num:"⑦",years:"1653〜1724年",event:"1703年「曾根崎心中」を発表",answer:"近松門左衛門",hint:"歌舞伎や人形浄瑠璃の脚本で町人の姿を生き生きとえがいた",era:"江戸時代"},
+    {num:"⑧",years:"1644〜1694年",event:"1689年「奥の細道」の旅",answer:"松尾芭蕉",hint:"旅をしながら自然を味わい深くよみこんだ俳句をつくった",era:"江戸時代"},
+    {num:"⑨",years:"1733〜1817年",event:"1774年「解体新書」を出版",answer:"杉田玄白",hint:"江戸の医者。死人の解剖をおこないオランダの医学書を翻訳した",era:"江戸時代"},
+    {num:"⑩",years:"1730〜1801年",event:"1798年「古事記伝」完成",answer:"本居宣長",hint:"「古事記」などを分析し、日本古来の文化を研究する国学を発展させた",era:"江戸時代"},
+    {num:"⑪",years:"1745〜1818年",event:"1800年 北海道を測量した",answer:"伊能忠敬",hint:"日本全国を旅して測量し、正確な日本地図を完成させた",era:"江戸時代"},
+    {num:"⑫",years:"1797〜1858年",event:"1833年「東海道五十三次」完成",answer:"歌川広重",hint:"木版の技術を使った浮世絵で風景や生活を色鮮やかにえがいた",era:"江戸時代"},
+  ]},
+  {id:4,label:"テスト4",era:"江戸末期〜明治",questions:[
+    {num:"①",years:"1793〜1837年",event:"1837年 大塩平八郎の乱",answer:"大塩平八郎",hint:"幕府のもと役人。ききんで苦しむ人々のために大阪で打ちこわしを起こした",era:"江戸時代"},
+    {num:"②",years:"1794〜1858年",event:"1853年 ペリー来航",answer:"ペリー",hint:"鎖国していた日本へ軍艦でやって来て開国させたアメリカ人",era:"江戸時代"},
+    {num:"③",years:"1815〜1860年",event:"1860年 大老井伊直弼 暗殺される",answer:"井伊直弼",hint:"アメリカ船来航の混乱の中幕府に反発する人々を厳しく処罰した",era:"江戸時代"},
+    {num:"④",years:"1804〜1850年",event:"1839年 幕府につかまった",answer:"高野長英",hint:"幕府を批判し開国を説いたが、捕まって弾圧をされた",era:"江戸時代"},
+    {num:"⑤",years:"1830〜1859年",event:"1857年 松下村塾の塾長になる",answer:"吉田松陰",hint:"木戸孝允など明治維新で活躍する人物を育てた",era:"江戸時代"},
+    {num:"⑥",years:"1835〜1867年",event:"1866年 薩長同盟を結ばせた",answer:"坂本龍馬",hint:"長州の木戸孝允と薩摩の西郷隆盛に同盟を結ばせた",era:"江戸時代"},
+    {num:"⑦",years:"1837〜1913年",event:"1867年 大政奉還",answer:"徳川慶喜",hint:"江戸幕府最後の将軍（15人目）。政権を天皇に返した",era:"江戸〜明治"},
+    {num:"⑧",years:"1827〜1877年",event:"1877年 西南戦争始まる",answer:"西郷隆盛",hint:"幕府を倒すために活躍した薩摩藩（鹿児島県）の家臣",era:"明治時代"},
+    {num:"⑨",years:"1823〜1899年",event:"1860年 咸臨丸でアメリカへ渡った",answer:"勝海舟",hint:"帰国後に海軍学校を作った。幕府代表となり隆盛と交渉した",era:"明治時代"},
+    {num:"⑩",years:"1833〜1877年",event:"1871年 廃藩置県を行う",answer:"木戸孝允",hint:"幕府を倒すために活躍し、明治政府では廃藩置県など新政策を進めた",era:"明治時代"},
+    {num:"⑪",years:"1830〜1878年",event:"1868年 王政復古の指導的役割",answer:"大久保利通",hint:"西郷隆盛らと幕府を倒すために活躍し明治維新を進めた",era:"明治時代"},
+    {num:"⑫",years:"1834〜1901年",event:"1872年「学問のすゝめ」発行",answer:"福沢諭吉",hint:"海外を旅し、古いしきたりにとらわれない考え方を広めた",era:"明治時代"},
+  ]},
+  {id:5,label:"テスト5",era:"明治時代",questions:[
+    {num:"①",years:"1841〜1909年",event:"1889年 大日本帝国憲法の発布",answer:"伊藤博文",hint:"内閣制度を作り明治政府で初代内閣総理大臣になる",era:"明治時代"},
+    {num:"②",years:"1837〜1919年",event:"1874年 自由民権運動が始まる",answer:"板垣退助",hint:"政府に、広く国民の意見を聞くよう働きかけ国会開設を約束させる",era:"明治時代"},
+    {num:"③",years:"1844〜1897年",event:"1894年 日英通商航海条約",answer:"陸奥宗光",hint:"アメリカなどと結んでいた不平等条約の改正に力をつくした",era:"明治時代"},
+    {num:"④",years:"1825〜1883年",event:"1871年 外国との不平等条約改正のため欧米視察",answer:"岩倉具視",hint:"外国の技術を取り入れる富岡製糸場などの殖産興業を進める",era:"明治時代"},
+    {num:"⑤",years:"1855〜1911年",event:"1905年 ロシアとポーツマス条約を結ぶ",answer:"小村寿太郎",hint:"陸奥宗光の部下で日露戦争の講和条約作りなどを担当した",era:"明治時代"},
+    {num:"⑥",years:"1838〜1922年",event:"1898年 内閣総理大臣になる",answer:"大隈重信",hint:"明治政府ができた当時の財政担当。後に政党を結成し総理大臣になる",era:"明治時代"},
+    {num:"⑦",years:"1840〜1931年",event:"1873年 日本初の株式会社をつくる",answer:"渋沢栄一",hint:"明治政府の役人退官後、銀行のほか、製紙、紡績、保険、鉄道など色々な会社を立ち上げる",era:"明治時代"},
+    {num:"⑧",years:"1841〜1913年",event:"1901年 足尾銅山の公害問題を天皇に直訴",answer:"田中正造",hint:"足尾銅山の公害問題で操業停止や被害者を助けるため、国会に何度も訴えた",era:"明治時代"},
+    {num:"⑨",years:"1847〜1934年",event:"1894年 日清戦争",answer:"東郷平八郎",hint:"朝鮮半島をめぐり清（中国）と戦いが起こり、海軍艦長として日本を勝利に導く",era:"明治時代"},
+    {num:"⑩",years:"1852〜1912年",event:"1868年 大政奉還・王政復古で政治の中心となる",answer:"明治天皇",hint:"大政奉還をむかえ、新政府の中心として身分制度の廃止、憲法制定など日本の近代化を進める",era:"明治時代"},
+    {num:"⑪",years:"1852〜1931年",event:"1889年 破傷風菌を研究用に生育することに成功",answer:"北里柴三郎",hint:"ドイツに留学して破傷風の治療法を発見し、帰国後伝染病研究所を作る",era:"明治時代"},
+    {num:"⑫",years:"1870〜1957年",event:"1897年 赤痢菌を発見する",answer:"志賀潔",hint:"北里柴三郎の教え子で、赤痢菌を発見し、治療薬も開発した",era:"明治〜大正"},
+    {num:"⑬",years:"1876〜1928年",event:"1927年 黄熱病の研究でアフリカへ行く",answer:"野口英世",hint:"北里柴三郎の教え子で、アメリカのロックフェラー医学研究所で黄熱病の研究をする",era:"明治〜大正"},
+  ]},
+  {id:6,label:"テスト6",era:"大正〜昭和",questions:[
+    {num:"①",years:"1886〜1971年",event:"1911年 女性のための雑誌「青鞜」を発刊",answer:"平塚らいてう",hint:"当時男性より低くおさえられていた女性の地位の向上を目指す運動を始める",era:"大正〜昭和"},
+    {num:"②",years:"1893〜1981年",event:"1919年 平塚らいてうと共に新婦人協会を作った",answer:"市川房枝",hint:"女性の選挙権獲得を主張して女性の立場で政治運動を続け、第二次世界大戦後は国会議員になる",era:"大正〜昭和"},
+    {num:"③",years:"1864〜1929年",event:"1900年「女子英学塾」（津田塾大学）を開く",answer:"津田梅子",hint:"1871年にアメリカへ日本人初の留学をする。帰国後女学校を開き、女性の社会進出に貢献する",era:"明治〜大正"},
+    {num:"④",years:"1862〜1933年",event:"1919年 国際連盟が設立され事務次長となる",answer:"新渡戸稲造",hint:"第一次世界大戦（1914〜1918年）の終了を調整する役目を担う",era:"明治〜大正"},
+    {num:"⑤",years:"1880〜1964年",event:"1945年 アメリカが日本を占領する",answer:"マッカーサー",hint:"最高司令官とする連合国軍最高司令官総司令部（GHQ）が、日本政府を監督することになった",era:"昭和時代"},
+    {num:"⑥",years:"1878〜1967年",event:"1951年 サンフランシスコ平和条約に調印",answer:"吉田茂",hint:"日本が国際社会に復帰するため、アメリカのサンフランシスコで平和条約を調印し、主権を回復した",era:"昭和時代"},
+    {num:"⑦",years:"1867〜1916年",event:"1906年 小説「坊ちゃん」を発表",answer:"夏目漱石",hint:"開国で日本人に生じた新たな心の悩みを小説にする",era:"明治〜大正"},
+    {num:"⑧",years:"1886〜1912年",event:"1910年 歌集「一握の砂」を発表",answer:"石川啄木",hint:"日本が朝鮮を併合し植民地にしたことに疑問を抱く歌や生活の苦しさを歌に表現した",era:"明治〜大正"},
+    {num:"⑨",years:"1872〜1896年",event:"1896年 小説「たけくらべ」を発表",answer:"樋口一葉",hint:"女性初の小説家で、少年少女の恋心の物語「たけくらべ」が代表作",era:"明治時代"},
+    {num:"⑩",years:"1878〜1942年",event:"1901年 歌集「みだれ髪」を発表",answer:"与謝野晶子",hint:"それまでの古い道徳に反対し、女性の恋愛感情を正直に表現する詩を多く発表する",era:"明治〜大正"},
+    {num:"⑪",years:"1884〜1943年",event:"1941年 太平洋戦争",answer:"山本五十六",hint:"連合艦隊を率いて、ハワイの真珠湾を攻撃し太平洋戦争の大きなきっかけになった",era:"昭和時代"},
+    {num:"⑫",years:"1901〜1989年",event:"1945年 ポツダム宣言を受け入れ太平洋戦争が終結",answer:"昭和天皇",hint:"戦争を終わらせ、天皇は神という考えを否定し、人間であることを宣言する",era:"昭和時代"},
+  ]},
+];
+
+let testBest = {};
+let weakMap = {};
+let histLog = [];
+let selectedId = null;
+let sess = { qs:[], idx:0, results:[], mode:'normal', currentTest:null };
+let answered = false;
+let histChartInst = null;
+
+function qKey(q){ return q.testId + '_' + q.num; }
+function norm(s){
+  return s.replace(/[\s　]+/g,'')
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .toLowerCase();
+}
+function fmtDate(ts){
+  const d = new Date(ts);
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function gotoTab(t){
+  if(t==='home'){
+    showScr('sHome');
+    renderHome();
+    return;
+  }
+  showScr('sOther');
+  ['tabDrill','tabHistory'].forEach((id,i) => {
+    document.getElementById(id).classList.toggle('active', (i===0&&t==='drill')||(i===1&&t==='history'));
+  });
+  if(t==='drill'){ showSubScr('sDrill'); renderDrill(); }
+  else { showSubScr('sHistory'); renderHistory(); }
+}
+
+function showScr(id){
+  ['sHome','sOther','sQuiz','sSummary'].forEach(s => {
+    const el=document.getElementById(s); if(el) el.classList.remove('on');
+  });
+  const el=document.getElementById(id); if(el) el.classList.add('on');
+}
+
+function showSubScr(id){
+  ['sDrill','sHistory'].forEach(s => {
+    const el=document.getElementById(s); if(el) el.classList.remove('on');
+  });
+  const el=document.getElementById(id); if(el) el.classList.add('on');
+}
+
+/* ---- HOME ---- */
+const KANJI_NUMS = ['一','二','三','四','五','六'];
+
+function renderHome(){
+  const g = document.getElementById('testGrid');
+  g.innerHTML = TESTS.map((t,i) => {
+    const sc = testBest[t.id];
+    const pct = sc ? Math.round(sc.correct / sc.total * 100) : 0;
+    const pill = sc
+      ? `<span class="tb-pill pill-done">${sc.correct}/${sc.total}</span>`
+      : `<span class="tb-pill pill-none">未挑戦</span>`;
+    return `<button class="test-btn${selectedId===t.id?' sel':''}" onclick="selectTest(${t.id})">
+      <div class="tb-body">
+        <div class="tb-era">${t.era}</div>
+        <div class="tb-num">${t.label}</div>
+      </div>
+      <div class="tb-right">
+        ${pill}
+        <div class="tb-bar"><div class="tb-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+    </button>`;
+  }).join('');
+  const btn = document.getElementById('startBtn');
+  if(selectedId){
+    btn.disabled = false;
+    btn.textContent = `はじめる →`;
+  } else {
+    btn.disabled = true;
+    btn.textContent = 'テストを選択してください';
+  }
+  // update home summary cards
+  const weak = getWeak();
+  const histSub = document.getElementById('homeHistSub');
+  const drillSub = document.getElementById('homeDrillSub');
+  if(histLog.length){
+    const last = histLog[histLog.length-1];
+    histSub.textContent = `${histLog.length}回受験 ／ 最近 ${Math.round(last.correct/last.total*100)}%`;
+  } else { histSub.textContent = 'まだありません'; }
+  if(weak.length){
+    drillSub.textContent = `苦手 ${weak.length}問 ／ 最多 ✕${weak[0].misses}回`;
+  } else { drillSub.textContent = '苦手問題がまだありません'; }
+}
+
+function selectTest(id){
+  selectedId = selectedId === id ? null : id;
+  renderHome();
+}
+
+function startSelected(){
+  if(!selectedId) return;
+  const t = TESTS.find(x => x.id === selectedId);
+  sess = { qs: t.questions.map(q => ({...q, testId:t.id, testLabel:t.label})), idx:0, results: new Array(t.questions.length).fill(null), mode:'normal', currentTest:t };
+  showScr('sQuiz');
+  renderQ();
+}
+
+/* ---- DRILL ---- */
+function recordMiss(q){ const k=qKey(q); if(!weakMap[k]) weakMap[k]={...q,misses:0,seen:0}; weakMap[k].misses++; weakMap[k].seen++; }
+function recordHit(q){ const k=qKey(q); if(!weakMap[k]) weakMap[k]={...q,misses:0,seen:0}; weakMap[k].seen++; if(weakMap[k].misses>0) weakMap[k].misses=Math.max(0,weakMap[k].misses-1); }
+function getWeak(){ return Object.values(weakMap).filter(w=>w.misses>0).sort((a,b)=>b.misses-a.misses); }
+
+function renderDrill(){
+  const weak = getWeak();
+  const el = document.getElementById('weakListEl');
+  const btn = document.getElementById('drillBtn');
+  if(!weak.length){
+    el.innerHTML = `<div class="no-data"><div class="no-data-icon">★</div><div class="no-data-title">苦手問題がありません</div><div class="no-data-sub">テストを受けると間違えた問題がここに表示されます</div></div>`;
+    btn.disabled = true; btn.textContent = '苦手問題がありません'; return;
+  }
+  const rc = ['r1','r2','r3'];
+  el.innerHTML = `<div class="weak-list">${weak.map((w,i) => `<div class="weak-item">
+    <div class="w-rank ${rc[i]||'rn'}">${i+1}</div>
+    <div class="w-info"><div class="w-name">${w.answer}</div><div class="w-meta">${w.testLabel} ${w.num} ｜ ${w.era}</div></div>
+    <div class="w-miss">✕${w.misses}</div>
+  </div>`).join('')}</div>`;
+  btn.disabled = false;
+  btn.textContent = `ドリルを開始（${weak.length}問中）`;
+}
+
+function startDrill(){
+  const weak = getWeak(); if(!weak.length) return;
+  const n = parseInt(document.getElementById('drillCnt').value);
+  const qs = weak.slice(0, Math.min(n, weak.length));
+  sess = { qs, idx:0, results: new Array(qs.length).fill(null), mode:'drill', currentTest:null };
+  showScr('sQuiz');
+  renderQ();
+}
+
+/* ---- HISTORY ---- */
+function renderHistory(){
+  const log = histLog;
+  const total = log.reduce((a,l) => a+l.total, 0);
+  const correct = log.reduce((a,l) => a+l.correct, 0);
+  const avg = total ? Math.round(correct/total*100) : 0;
+  const streak = calcStreak();
+  document.getElementById('histStats').innerHTML = `
+    <div class="hstat"><div class="hstat-n" style="color:var(--acc)">${log.length}</div><div class="hstat-l">受験回数</div></div>
+    <div class="hstat"><div class="hstat-n" style="color:var(--pur)">${avg}%</div><div class="hstat-l">平均正解率</div></div>
+    <div class="hstat"><div class="hstat-n" style="color:var(--amb)">${streak}</div><div class="hstat-l">連続学習日数</div></div>
+    <div class="hstat"><div class="hstat-n" style="color:var(--red)">${getWeak().length}</div><div class="hstat-l">苦手問題数</div></div>`;
+  renderHistChart(log);
+  renderBreakdown();
+  renderLogList(log);
+}
+
+function calcStreak(){
+  if(!histLog.length) return 0;
+  const days = new Set(histLog.map(l => new Date(l.ts).toDateString()));
+  let s=0, d=new Date();
+  for(let i=0; i<365; i++){
+    if(days.has(d.toDateString())) s++;
+    else if(s>0) break;
+    d.setDate(d.getDate()-1);
+  }
+  return s;
+}
+
+function renderHistChart(log){
+  const recent = log.slice(-10);
+  const canvas = document.getElementById('histChart');
+  if(histChartInst){ histChartInst.destroy(); histChartInst=null; }
+  if(!recent.length){ canvas.parentElement.style.height='60px'; return; }
+  canvas.parentElement.style.height='180px';
+  const labels = recent.map((l,i) => l.mode==='drill' ? `D${i+1}` : (l.shortLabel||`#${i+1}`));
+  const data = recent.map(l => Math.round(l.correct/l.total*100));
+  const colors = recent.map(l => l.mode==='drill' ? '#EF9F27' : '#1D9E75');
+  histChartInst = new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets:[{ label:'正解率(%)', data, backgroundColor: colors, borderRadius:4, borderSkipped:false }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c => c.parsed.y+'%' }}},
+      scales:{
+        y:{ min:0, max:100, ticks:{ callback: v => v+'%', font:{size:11} }, grid:{ color:'rgba(128,128,128,.1)' }},
+        x:{ ticks:{ font:{size:11}, maxRotation:0 }, grid:{display:false} }
+      }
+    }
+  });
+}
+
+function renderBreakdown(){
+  const el = document.getElementById('testBreakdown');
+  el.innerHTML = TESTS.map(t => {
+    const sc = testBest[t.id];
+    const pct = sc ? Math.round(sc.correct/sc.total*100) : 0;
+    return `<div class="tbr">
+      <div class="tbr-label">${t.label}</div>
+      <div class="tbr-bar-outer"><div class="tbr-bar-inner" style="width:${pct}%"></div></div>
+      <div class="tbr-pct">${sc ? pct+'%' : '−'}</div>
+      <div class="tbr-cnt">${sc ? sc.correct+'/'+sc.total : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderLogList(log){
+  const el = document.getElementById('histLog');
+  if(!log.length){
+    el.innerHTML = `<div class="no-data"><div class="no-data-icon">○</div><div class="no-data-title">まだ記録がありません</div><div class="no-data-sub">テストを受けると履歴が表示されます</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="hist-log">${[...log].reverse().map(l => {
+    const pct = Math.round(l.correct/l.total*100);
+    const col = pct>=80 ? 'var(--acc)' : pct>=60 ? 'var(--amb-m)' : 'var(--red)';
+    const isDrill = l.mode==='drill';
+    return `<div class="log-item">
+      <div class="log-mode ${isDrill?'lm-drill':'lm-test'}">${isDrill?'ドリル':'テスト'}</div>
+      <div class="log-info">
+        <div class="log-title">${l.label}</div>
+        <div class="log-meta">${fmtDate(l.ts)}</div>
+      </div>
+      <div class="log-score">
+        <div class="log-pct" style="color:${col}">${pct}%</div>
+        <div class="log-cnt">${l.correct}/${l.total}</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ---- QUIZ ---- */
+function renderQ(){
+  answered = false;
+  const q = sess.qs[sess.idx];
+  const total = sess.qs.length;
+  const isDrill = sess.mode === 'drill';
+  const pf = document.getElementById('progFill');
+  pf.style.width = Math.round(sess.idx/total*100) + '%';
+  pf.className = 'prog-fill ' + (isDrill ? 'pf-d' : 'pf-n');
+  document.getElementById('qCtr').textContent = `問題 ${sess.idx+1} / ${total}`;
+  const mb = document.getElementById('mBadge');
+  mb.textContent = isDrill ? '苦手克服ドリル' : q.era;
+  mb.className = 'q-mbadge ' + (isDrill ? 'mb-d' : 'mb-n');
+  document.getElementById('qTags').innerHTML =
+    `<span class="tag t-yr">生没年：${q.years}</span><span class="tag t-ev">${q.event}</span>` +
+    (isDrill ? `<span class="tag t-era">${q.era}</span>` : '');
+  const mb2 = document.getElementById('missBadge');
+  if(isDrill && weakMap[qKey(q)] && weakMap[qKey(q)].misses > 0){
+    mb2.style.display = 'flex';
+    document.getElementById('missText').textContent = `これまで ${weakMap[qKey(q)].misses} 回間違えています`;
+  } else { mb2.style.display = 'none'; }
+  document.getElementById('qText').textContent = `${q.num} この人物はだれですか？`;
+  document.getElementById('qDesc').textContent = `ヒント：${q.hint}`;
+  const inp = document.getElementById('ansInp');
+  inp.value = ''; inp.className = 'ans-inp'; inp.removeAttribute('disabled');
+  document.getElementById('resRow').className = 'res-row';
+  const bc = document.getElementById('btnChk');
+  bc.style.display = ''; bc.className = 'btn btn-chk' + (isDrill ? ' drill' : '');
+  document.getElementById('btnNxt').style.display = 'none';
+  renderDots();
+  setTimeout(() => inp.focus(), 80);
+}
+
+function renderDots(){
+  document.getElementById('dotsEl').innerHTML = sess.qs.map((_,i) => {
+    const r = sess.results[i];
+    let c = 'dot';
+    if(i===sess.idx) c+=' cur';
+    else if(r==='ok') c+=' ok';
+    else if(r==='ng') c+=' ng';
+    else if(r==='sk') c+=' sk';
+    return `<button class="${c}" onclick="jumpTo(${i})" title="${i+1}問目"></button>`;
+  }).join('');
+}
+
+function checkAns(){
+  if(answered) return; answered = true;
+  const q = sess.qs[sess.idx];
+  const inp = document.getElementById('ansInp');
+  const ok = norm(inp.value.trim()) === norm(q.answer);
+  sess.results[sess.idx] = ok ? 'ok' : 'ng';
+  if(ok) recordHit(q); else recordMiss(q);
+  inp.className = 'ans-inp ' + (ok ? 'ok' : 'ng');
+  inp.setAttribute('disabled','true');
+  const rr = document.getElementById('resRow');
+  rr.className = 'res-row ' + (ok ? 'ok' : 'ng') + ' on';
+  document.getElementById('rIcon').textContent = ok ? '○' : '×';
+  document.getElementById('rMsg').innerHTML = ok
+    ? `正解！　<span class="ca ok">${q.answer}</span>`
+    : `不正解　正解：<span class="ca ng">${q.answer}</span>`;
+  document.getElementById('btnChk').style.display = 'none';
+  document.getElementById('btnNxt').style.display = '';
+  renderDots();
+}
+
+function skipQ(){
+  if(answered) return;
+  sess.results[sess.idx] = 'sk'; recordMiss(sess.qs[sess.idx]); nextQ();
+}
+
+function nextQ(){
+  if(sess.idx < sess.qs.length-1){ sess.idx++; renderQ(); }
+  else showSummary();
+}
+
+function jumpTo(i){
+  if(!answered && sess.results[sess.idx]===null){ sess.results[sess.idx]='sk'; recordMiss(sess.qs[sess.idx]); }
+  sess.idx = i; renderQ();
+}
+
+/* ---- SUMMARY ---- */
+function showSummary(){
+  showScr('sSummary');
+  const isDrill = sess.mode === 'drill';
+  const total = sess.qs.length;
+  const correct = sess.results.filter(r => r==='ok').length;
+  const pct = Math.round(correct/total*100);
+  const label = isDrill ? '苦手克服ドリル' : (sess.currentTest.label + ' (' + sess.currentTest.era + ')');
+  const shortLabel = isDrill ? 'ドリル' : sess.currentTest.label;
+  histLog.push({ ts:Date.now(), mode:sess.mode, label, shortLabel, correct, total });
+  if(!isDrill && sess.currentTest){
+    const prev = testBest[sess.currentTest.id];
+    if(!prev || correct > prev.correct) testBest[sess.currentTest.id] = { correct, total };
+  }
+  const sc = document.getElementById('sumScore');
+  sc.textContent = pct + '%'; sc.className = 'sum-score ' + (isDrill ? 'd' : 'n');
+  document.getElementById('sumLbl').textContent = `${correct} / ${total} 問正解 ｜ ${label}`;
+  const pf = document.getElementById('sumPfill');
+  pf.style.width = '0%'; pf.className = 'sum-pfill ' + (isDrill ? 'spf-d' : 'spf-n');
+  setTimeout(() => pf.style.width = pct + '%', 50);
+  document.getElementById('sC').textContent = correct;
+  document.getElementById('sW').textContent = total - correct;
+  const wrongQs = sess.qs.filter((_,i) => sess.results[i]==='ng' || sess.results[i]==='sk');
+  const sw = document.getElementById('sumWeak');
+  if(wrongQs.length){
+    sw.style.display = 'block';
+    document.getElementById('sumWeakList').innerHTML = wrongQs.map(q =>
+      `<div class="sum-weak-row"><span class="sum-weak-name">${q.num} ${q.answer}（${q.era}）</span><span class="sum-weak-cnt">✕${(weakMap[qKey(q)]||{misses:1}).misses}回</span></div>`
+    ).join('');
+  } else { sw.style.display = 'none'; }
+  const br = document.getElementById('sumBtnRow');
+  const drillBtn = getWeak().length ? `<button class="btn-s d" onclick="goToDrill()">苦手ドリルへ</button>` : '';
+  br.innerHTML = isDrill
+    ? `<button class="btn-s d" onclick="startDrill()">もう一度ドリル</button>${drillBtn}`
+    : `<button class="btn-s n" onclick="retryTest()">もう一度挑戦</button>${drillBtn}`;
+}
+
+function retryTest(){
+  const t = sess.currentTest;
+  sess = { qs: t.questions.map(q=>({...q,testId:t.id,testLabel:t.label})), idx:0, results:new Array(t.questions.length).fill(null), mode:'normal', currentTest:t };
+  showScr('sQuiz'); renderQ();
+}
+
+function goToDrill(){ gotoTab('drill'); }
+function goHome(){ selectedId=null; gotoTab('home'); }
+
+document.getElementById('ansInp').addEventListener('keydown', e => {
+  if(e.key==='Enter'){ if(!answered) checkAns(); else nextQ(); }
+});
+
+renderHome();
+</script>
+</body>
+</html>
