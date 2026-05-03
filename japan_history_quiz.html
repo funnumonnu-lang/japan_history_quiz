@@ -648,20 +648,20 @@ function renderQ(){
   mb.textContent = isDrill ? '苦手克服ドリル' : q.era;
   mb.className = 'q-mbadge ' + (isDrill ? 'mb-d' : 'mb-n');
   document.getElementById('qTags').innerHTML =
-    `<span class="tag t-yr">生没年：${q.years}</span><span class="tag t-ev">${q.event}</span>` +
+    `<span class="tag t-yr">生没年：${q.years}</span>` +
     (isDrill ? `<span class="tag t-era">${q.era}</span>` : '');
   const mb2 = document.getElementById('missBadge');
   if(isDrill && weakMap[qKey(q)] && weakMap[qKey(q)].misses > 0){
     mb2.style.display = 'flex';
     document.getElementById('missText').textContent = `これまで ${weakMap[qKey(q)].misses} 回間違えています`;
   } else { mb2.style.display = 'none'; }
-  document.getElementById('qText').textContent = `${q.num} この人物はだれですか？`;
-  document.getElementById('qDesc').textContent = `ヒント：${q.hint}`;
+  document.getElementById('qText').textContent = `${q.num} ${q.hint}はだれですか？`;
+  document.getElementById('qDesc').textContent = `ヒント：${q.event}`;
   const inp = document.getElementById('ansInp');
   inp.value = ''; inp.className = 'ans-inp'; inp.removeAttribute('disabled');
   document.getElementById('resRow').className = 'res-row';
   const bc = document.getElementById('btnChk');
-  bc.style.display = ''; bc.className = 'btn btn-chk' + (isDrill ? ' drill' : '');
+  bc.style.display = 'block'; bc.className = 'btn btn-chk' + (isDrill ? ' drill' : '');
   document.getElementById('btnNxt').style.display = 'none';
   renderDots();
   setTimeout(() => inp.focus(), 80);
@@ -695,7 +695,7 @@ function checkAns(){
     ? `正解！　<span class="ca ok">${q.answer}</span>`
     : `不正解　正解：<span class="ca ng">${q.answer}</span>`;
   document.getElementById('btnChk').style.display = 'none';
-  document.getElementById('btnNxt').style.display = '';
+  document.getElementById('btnNxt').style.display = 'block';
   renderDots();
 }
 
